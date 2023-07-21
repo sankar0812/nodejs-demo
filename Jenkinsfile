@@ -6,10 +6,9 @@ pipeline {
     stages { 
         stage('SCM Checkout') {
             steps{
-            https://github.com/sankar0812/nodejs-demo.git
+              https://github.com/sankar0812/nodejs-demo.git
             }
         }
-
         stage('Build docker image') {
             steps {  
                 sh 'docker build -t sankar0812/nodeapp:$BUILD_NUMBER .'
