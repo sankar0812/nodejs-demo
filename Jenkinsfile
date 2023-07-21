@@ -5,9 +5,9 @@ pipeline {
     }
     stages { 
         stage('SCM Checkout') {
-            steps{
-              https://github.com/sankar0812/nodejs-demo.git
-            }
+            steps {
+               https://github.com/sankar0812/nodejs-demo.git
+             }
         }
         stage('Build docker image') {
             steps {  
@@ -15,12 +15,12 @@ pipeline {
             }
         }
         stage('login to dockerhub') {
-            steps{
+            steps {
                 sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
             }
         }
         stage('push image') {
-            steps{
+            steps {
                 sh 'docker push sankar0812/nodeapp:$BUILD_NUMBER'
             }
         }
