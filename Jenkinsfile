@@ -10,6 +10,16 @@ pipeline {
                git 'https://github.com/sankar0812/nodejs-demo.git'
             }
         }
+         stage('Delete docker image') {
+            steps {  
+                sh 'docker rmi -f sankar0812/nodeapp:$BUILD_NUMBER'
+            }
+        }
+        stage('Delete docker container') {
+            steps {  
+                sh 'docker rm -f web1'
+            }
+        }
         stage('Build docker image') {
             steps {  
                 sh 'docker build -t sankar0812/nodeapp:$BUILD_NUMBER .'
