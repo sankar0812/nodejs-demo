@@ -7,6 +7,10 @@ pipeline {
     stages { 
         stage('SCM Checkout') {
             steps {
+              withEnv(["PATH+BUILD_DIR=${WORKSPACE}/build-dir"]) {
+              echo "PATH is: $PATH"
+              sh 'echo "PATH is: $PATH"'
+              }
             git 'https://github.com/sankar0812/nodejs-demo.git'
             }
         }
