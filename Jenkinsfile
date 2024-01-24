@@ -2,16 +2,12 @@ pipeline {
     agent any 
     environment {
     DOCKERHUB_CREDENTIALS = credentials('docker-hub-sankar')
-    PATH=$WORKSPACE/build-dir:$PATH
+    PATH="${env.WORKSPACE}/build-dir:${env.PATH}
     }
     stages { 
         stage('SCM Checkout') {
             steps {
-              withEnv(["PATH+BUILD_DIR=${WORKSPACE}/build-dir"]) {
-              echo "PATH is: $PATH"
-              sh 'echo "PATH is: $PATH"'
-              }
-            git 'https://github.com/sankar0812/nodejs-demo.git'
+               git 'https://github.com/sankar0812/nodejs-demo.git'
             }
         }
         stage('Build docker image') {
