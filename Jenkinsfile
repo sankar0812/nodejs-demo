@@ -2,6 +2,7 @@ pipeline {
     agent any 
     environment {
     DOCKERHUB_CREDENTIALS = credentials('docker-hub-sankar')
+    PATH=$WORKSPACE/build-dir:$PATH
     }
     stages { 
         stage('SCM Checkout') {
