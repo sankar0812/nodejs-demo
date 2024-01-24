@@ -12,7 +12,7 @@ pipeline {
         }
          stage('Delete docker image') {
             steps {  
-                sh 'docker rmi -f sankar0812/nodeapp:$BUILD_NUMBER'
+                sh 'docker rmi -f sankar0812/nodeapp:$BUILD_NUMBER-1'
             }
         }
         stage('Delete docker container') {
