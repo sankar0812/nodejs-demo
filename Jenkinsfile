@@ -10,10 +10,11 @@ pipeline {
                git 'https://github.com/sankar0812/nodejs-demo.git'
             }
         }
-         stage('Delete docker image') {
-            steps {  
+        stage('Delete Docker Image') {
+            steps {
                 def previousBuildNumber = currentBuild.number - 1
-                sh 'docker rmi -f sankar0812/nodeapp:$previousBuildNumber'
+                // Use double-quotes for string interpolation
+                sh "docker rmi -f sankar0812/nodeapp:$previousBuildNumber"
             }
         }
         stage('Delete docker container') {
