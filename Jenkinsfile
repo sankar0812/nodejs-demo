@@ -12,9 +12,11 @@ pipeline {
         }
         stage('Delete Docker Image') {
             steps {
-                def previousBuildNumber = currentBuild.number - 1
-                // Use double-quotes for string interpolation
-                sh "docker rmi -f sankar0812/nodeapp:$previousBuildNumber"
+                script {
+                    def previousBuildNumber = currentBuild.number - 1
+                    // Use double-quotes for string interpolation
+                    sh "docker rmi -f sankar0812/nodeapp:$previousBuildNumber"
+                }
             }
         }
         stage('Delete docker container') {
