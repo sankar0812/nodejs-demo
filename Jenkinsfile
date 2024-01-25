@@ -12,7 +12,8 @@ pipeline {
         }
          stage('Delete docker image') {
             steps {  
-                sh 'docker rmi -f sankar0812/nodeapp:$BUILD_NUMBER'
+                def previousBuildNumber = currentBuild.number - 1
+                sh 'docker rmi -f sankar0812/nodeapp:$previousBuildNumber'
             }
         }
         stage('Delete docker container') {
