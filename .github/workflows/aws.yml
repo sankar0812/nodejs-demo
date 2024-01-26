@@ -45,23 +45,12 @@ jobs:
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+        
+    - name: Pull the Docker image from Amazon ECR
+      run: |
+        $(aws ecr get-login --no-include-email --region ap-south-1)
+        docker pull 273521728595.dkr.ecr.ap-south-1.amazonaws.com/github-action:e3bbb2b233d3317bfd4122302201a9d9a171cbcc
 
-    - name: SSH into EC2 and pull the Docker image
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ env.EC2_INSTANCE_IP }}
-        username: ${{ secrets.EC2_SSH_USERNAME }}
-        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-        script: |
-          docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
-    - name: SSH into EC2 and deploy the Docker container
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ env.EC2_INSTANCE_IP }}
-        username: ${{ secrets.EC2_SSH_USERNAME }}
-        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-        script: |
-          docker stop $CONTAINER_NAME || true
-          docker rm $CONTAINER_NAME || true
-          docker run -d --name $CONTAINER_NAME -p 80:80 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+    - name: Run the Docker container
+      run: |
+        docker run -d --name my-container -p 8080:80 273521728595.dkr.ecr.ap-south-1.amazonaws.com/github-action:e3bbb2b233d3317bfd4122302201a9d9a171cbcc
