@@ -9,6 +9,7 @@ env:
   ECR_REPOSITORY: github-action
   CONTAINER_NAME: git-action-container
   EC2_INSTANCE_IP: 13.232.145.122
+  ECR_REGISTRY: 273521728595.dkr.ecr.ap-south-1.amazonaws.com
 
 permissions:
   contents: read
@@ -46,27 +47,22 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
         
-    - name: SSH into EC2, pull the Docker image, and deploy
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ env.EC2_INSTANCE_IP }}
-        username: ${{ secrets.EC2_SSH_USERNAME }}
-        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-        script: |
-          # Ensure variables are properly set
-          ECR_REGISTRY="${ECR_REGISTRY:-273521728595.dkr.ecr.ap-south-1.amazonaws.com}"
-          ECR_REPOSITORY="${ECR_REPOSITORY:-github-action}"
-          IMAGE_TAG="${IMAGE_TAG:-latest}"
+    - name: Configure AWS credentials and login to Amazon ECR
+      run: |
+        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws configure set region ${{ env.AWS_REGION }}
+        aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
 
-          # Debug: Output variables to confirm they are set correctly
-          echo "ECR_REGISTRY: $ECR_REGISTRY"
-          echo "ECR_REPOSITORY: $ECR_REPOSITORY"
-          echo "IMAGE_TAG: $IMAGE_TAG"
+    - name: Debug Environment Variables
+      run: |
+        echo "ECR_REGISTRY: ${{ env.ECR_REGISTRY }}"
+        echo "ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}"
+        echo "IMAGE_TAG: ${{ github.sha }}"
 
-          # Pull the Docker image from Amazon ECR
-          docker pull 273521728595.dkr.ecr.ap-south-1.amazonaws.com/github-action:a732dbe97975648d77ec985cb1f61cc9da83567a
-
-
+    - name: Pull the Docker image from Amazon ECR
+      run: |
+        docker pull "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}"
 
     - name: SSH into EC2 and deploy the Docker container
       uses: appleboy/ssh-action@master
@@ -75,7 +71,10 @@ jobs:
         username: ${{ secrets.EC2_SSH_USERNAME }}
         key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
         script: |
-          docker stop $CONTAINER_NAME || true
-          docker rm $CONTAINER_NAME || true
-          docker run -d --name $CONTAINER_NAME -p 80:80 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          # Stop and remove the existing container if it exists
+          docker stop ${{ env.CONTAINER_NAME }} || true
+          docker rm ${{ env.CONTAINER_NAME }} || true
+
+          # Run the new Docker container
+          docker run -d --name ${{ env.CONTAINER_NAME }} -p 80:80 "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}"
 
