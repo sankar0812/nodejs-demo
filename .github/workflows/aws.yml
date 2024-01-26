@@ -58,8 +58,14 @@ jobs:
           ECR_REPOSITORY="${ECR_REPOSITORY:-github-action}"
           IMAGE_TAG="${IMAGE_TAG:-latest}"
 
+          # Debug: Output variables to confirm they are set correctly
+          echo "ECR_REGISTRY: $ECR_REGISTRY"
+          echo "ECR_REPOSITORY: $ECR_REPOSITORY"
+          echo "IMAGE_TAG: $IMAGE_TAG"
+
           # Pull the Docker image from Amazon ECR
-          docker pull "${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
+          docker pull "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
 
 
     - name: SSH into EC2 and deploy the Docker container
