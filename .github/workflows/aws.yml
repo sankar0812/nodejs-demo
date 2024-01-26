@@ -48,7 +48,6 @@ jobs:
         
     - name: Pull the Docker image from Amazon ECR
       run: |
-        $(aws ecr get-login --no-include-email --region ap-south-1)
         docker pull 273521728595.dkr.ecr.ap-south-1.amazonaws.com/github-action:e3bbb2b233d3317bfd4122302201a9d9a171cbcc
 
     - name: Run the Docker container
