@@ -65,9 +65,3 @@ jobs:
           docker stop $CONTAINER_NAME || true
           docker rm $CONTAINER_NAME || true
           docker run -d --name $CONTAINER_NAME -p 80:80 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
-		
-
-
-
-    
