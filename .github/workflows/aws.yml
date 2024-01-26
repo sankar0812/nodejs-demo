@@ -64,7 +64,7 @@ jobs:
           echo "IMAGE_TAG: $IMAGE_TAG"
 
           # Pull the Docker image from Amazon ECR
-          docker pull "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          docker pull 273521728595.dkr.ecr.ap-south-1.amazonaws.com/github-action:a732dbe97975648d77ec985cb1f61cc9da83567a
 
 
 
