@@ -16,8 +16,7 @@ permissions:
 
 jobs:
   deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
+    runs-on: self-hosted  # Add this line to specify that the job runs on a self-hosted runner
     environment: production
 
     steps:
