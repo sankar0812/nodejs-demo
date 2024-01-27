@@ -38,8 +38,7 @@ jobs:
         docker rm ${{ env.CONTAINER_NAME }} || true
 
         # Delete old Docker images
-        docker image prune -f
-        set +x
+        docker rmi $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
@@ -52,9 +51,9 @@ jobs:
 
     - name: Pull the Docker image from Amazon ECR
       run: |
-        docker pull "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG"
+        docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
     - name: Deploy the Docker container on EC2
       run: |
           # Run the new Docker container
-          docker run -d --name ${{ env.CONTAINER_NAME }} -p 3000:3000 "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG"
+          docker run -d --name ${{ env.CONTAINER_NAME }} -p 3000:3000 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
