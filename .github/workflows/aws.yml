@@ -31,19 +31,14 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Delete old Docker images
+    - name: Delete old Docker Container and Docker images
       run: |
         # Stop and remove the existing container if it exists
         docker stop ${{ env.CONTAINER_NAME }} || true
         docker rm ${{ env.CONTAINER_NAME }} || true
 
-        # Get the image ID based on the image reference
-        IMAGE_ID=$(docker images -q ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }})
-
-        # Delete the Docker image using the image ID
-        if [ -n "$IMAGE_ID" ]; then
-          docker rmi $IMAGE_ID
-        fi
+        # remove the old images
+        docker image prune -af || true
 
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
