@@ -37,7 +37,7 @@ jobs:
         # Fetch the image list from the ECR repository
         IMAGE_LIST=$(aws ecr list-images --region ${{ env.AWS_REGION }} --repository-name ${{ env.ECR_REPOSITORY }} --query 'imageIds[*].[imageDigest,imagePushedAt]' --output json | jq -r 'sort_by(.[1])[:-${{ env.MAX_IMAGES_TO_KEEP }}] | .[] | .[0]')
 
-        # Loop through the list of old images and delete them to
+        # Loop through the list of old images and delete them
         for IMAGE_ID in $IMAGE_LIST; do
           aws ecr batch-delete-image --region ${{ env.AWS_REGION }} --repository-name ${{ env.ECR_REPOSITORY }} --image-ids imageDigest=$IMAGE_ID
         done
