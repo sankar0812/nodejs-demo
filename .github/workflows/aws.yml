@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   deploy:
-    runs-on: self-hosted  # Add this line to specify that the job runs on a self-hosted runner
+    runs-on: self-hosted 
     environment: production
 
     steps:
@@ -45,35 +45,17 @@ jobs:
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-        
-    - name: Configure AWS credentials and login to Amazon ECR
-      run: |
-        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws configure set region ${{ env.AWS_REGION }}
-        aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
-
-    - name: Debug Environment Variables
-      run: |
-        echo "ECR_REGISTRY: ${{ env.ECR_REGISTRY }}"
-        echo "ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}"
-        echo "IMAGE_TAG: ${{ github.sha }}"
 
     - name: Pull the Docker image from Amazon ECR
       run: |
-        docker pull "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}"
+        docker pull "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
 
-    - name: SSH into EC2 and deploy the Docker container
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ env.EC2_INSTANCE_IP }}
-        username: ${{ secrets.EC2_SSH_USERNAME }}
-        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-        script: |
+    - name: deploy the Docker container EC2
+      run: |
           # Stop and remove the existing container if it exists
           docker stop ${{ env.CONTAINER_NAME }} || true
           docker rm ${{ env.CONTAINER_NAME }} || true
 
           # Run the new Docker container
-          docker run -d --name ${{ env.CONTAINER_NAME }} -p 3000:3000 "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}"
+          docker run -d --name ${{ env.CONTAINER_NAME }} -p 3000:3000 "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG"
 
