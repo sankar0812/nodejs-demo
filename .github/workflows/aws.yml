@@ -36,7 +36,6 @@ jobs:
         # Stop and remove the existing container if it exists
         docker stop ${{ env.CONTAINER_NAME }} || true
         docker rm ${{ env.CONTAINER_NAME }} || true
-
         # remove the old images
         docker image prune -af || true
 
