@@ -33,7 +33,7 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
 
     - name: Install jq
-      run: sudo apt-get install jq
+      run: sudo apt-get install jq -y
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
