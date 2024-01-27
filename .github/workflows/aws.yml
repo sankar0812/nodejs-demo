@@ -34,12 +34,11 @@ jobs:
     - name: Delete old Docker images
       run: |
         # Stop and remove the existing container if it exists
-        set -x
         docker stop ${{ env.CONTAINER_NAME }} || true
         docker rm ${{ env.CONTAINER_NAME }} || true
 
         # Delete old Docker images
-        docker rmi $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.IMAGE_TAG }}
+        docker rmi $ECR_REGISTRY/$ECR_REPOSITORY:${{ env.IMAGE_TAG }} || true
 
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
