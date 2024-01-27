@@ -10,7 +10,7 @@ env:
   CONTAINER_NAME: git-action-container
   ECR_REGISTRY: 273521728595.dkr.ecr.ap-south-1.amazonaws.com
   IMAGE_TAG: ${{ github.sha }}
-  MAX_IMAGES_TO_KEEP: 3
+  MAX_IMAGES_TO_KEEP: 2
 
 jobs:
   deploy:
