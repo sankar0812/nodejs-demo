@@ -10,6 +10,7 @@ env:
   CONTAINER_NAME: git-action-container
   ECR_REGISTRY: 273521728595.dkr.ecr.ap-south-1.amazonaws.com
   IMAGE_TAG: ${{ github.sha }}
+  MAX_IMAGES_TO_KEEP: 3
 
 jobs:
   deploy:
@@ -30,6 +31,16 @@ jobs:
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Delete old ECR images
+      run: |
+        # Fetch the image list from the ECR repository
+        IMAGE_LIST=$(aws ecr list-images --region ${{ env.AWS_REGION }} --repository-name ${{ env.ECR_REPOSITORY }} --query 'imageIds[*].[imageDigest,imagePushedAt]' --output json | jq -r 'sort_by(.[1])[:-${{ env.MAX_IMAGES_TO_KEEP }}] | .[] | .[0]')
+
+        # Loop through the list of old images and delete them
+        for IMAGE_ID in $IMAGE_LIST; do
+          aws ecr batch-delete-image --region ${{ env.AWS_REGION }} --repository-name ${{ env.ECR_REPOSITORY }} --image-ids imageDigest=$IMAGE_ID
+        done
 
     - name: Delete old Docker Container and Docker images
       run: |
