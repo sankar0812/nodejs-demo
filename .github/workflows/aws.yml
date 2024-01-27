@@ -8,7 +8,7 @@ env:
   AWS_REGION: ap-south-1                 
   ECR_REPOSITORY: github-action
   CONTAINER_NAME: git-action-container
-  EC2_INSTANCE_IP: 13.232.145.122
+  #EC2_INSTANCE_IP: 13.232.145.122
   ECR_REGISTRY: 273521728595.dkr.ecr.ap-south-1.amazonaws.com
 
 permissions:
@@ -36,9 +36,9 @@ jobs:
 
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ github.sha }}
+     # env:
+       # ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        #IMAGE_TAG: ${{ github.sha }}
       run: |
         # Build a docker container and
         # push it to ECR
